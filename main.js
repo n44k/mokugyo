@@ -61,12 +61,35 @@ let notes = new Map(); // id -> {el, spawnTime, targetTime, hit}
 let spawnTimer = null;
 let beatInterval = () => 60 / CONFIG.BPM;
 let effectsTimeouts = [];
+let gameOver = false;
 
 // apply initial config UI
 document.getElementById('bpmInput').value = CONFIG.BPM;
 document.getElementById('offsetInput').value = CONFIG.OFFSET;
 
 // ===== helpers =====
+// ▼ ゲームオーバー処理
+function triggerGameOver() {
+    if (gameOver) return; // すでにゲームオーバーなら処理しない
+    gameOver = true;
+
+    const gameOverScreen = document.getElementById("gameOverScreen");
+    gameOverScreen.style.display = "flex"; // 表示
+}
+
+// ▼ リスタート処理（スタートボタン押した時など）
+function restartGame() {
+    gameOver = false;
+    document.getElementById("gameOverScreen").style.display = "none"; // 非表示
+    missCount = 0;
+    combo = 0;
+    hannyaPos = -200;
+    document.getElementById("hannya").style.right = hannyaPos + "px";
+    document.getElementById("message").textContent = "お経に合わせて叩け！";
+    // BGMをリセットして再生
+    bgm.currentTime = 0;
+    bgm.play();
+}
 function createAudioContextIfNeeded(){
   if(!audioCtx){
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
