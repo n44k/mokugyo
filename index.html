@@ -1,63 +1,105 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>木魚リズム：般若の間</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="preload" as="audio" href="bgm.mp3">
-  <link rel="preload" as="audio" href="se_hit.mp3">
-  <link rel="preload" as="audio" href="se_miss.mp3">
-  <link rel="preload" as="image" href="bg_room.jpg">
-  <link rel="preload" as="image" href="mokugyo.png">
-  <link rel="preload" as="image" href="hannya.png">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>木魚リズム：般若の間（拡張版）</title>
+
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div id="game">
-    <!-- 背景（和室） -->
-    <img id="bg" src="assets/bg_room.jpg" alt="和室背景" />
+    <!-- 左上：お経開始マーク（常に表示） -->
+    <div id="buddhaMark">🕯️ お経開始</div>
 
-    <!-- 般若（右奥→接近→背後へ移動演出→GameOver） -->
-    <img id="hannya" src="assets/hannya.png" alt="般若" aria-hidden="true" />
+    <!-- 背景（assets/bg_room.jpg 等で差し替え） -->
+    <img id="bg" src="assets/bg_room.jpg" alt="和室背景">
 
-    <!-- 木魚（クリックまたはSpaceで叩く） -->
-    <button id="mokugyoBtn" aria-label="木魚を叩く">
-      <img id="mokugyo" src="assets/mokugyo.png" alt="木魚" />
-    </button>
+    <!-- 般若 -->
+    <img id="hannya" src="assets/hannya.png" alt="般若" />
 
-    <!-- UI -->
+    <!-- ノーツ領域（上からノーツが飛んでくる） -->
+    <div id="noteLayer"></div>
+
+    <!-- 木魚ボタン -->
+    <button id="mokugyoBtn"><img id="mokugyo" src="assets/mokugyo.png" alt="木魚"></button>
+
+    <!-- HUD: 判定表示（位置は設定で上/下） -->
+    <div id="judgementTop" class="judgementArea hidden"></div>
+    <div id="judgementBottom" class="judgementArea">お経に合わせて叩け</div>
+
+    <!-- HUD ステータス -->
     <div id="hud">
-      <div id="status">
-        <span id="msg">お経に合わせて叩け</span>
-        <span id="combo">COMBO 0</span>
-        <span id="lives">MISS 0/6</span>
-      </div>
-      <div id="barWrap" aria-hidden="true"><div id="timingBar"></div></div>
+      <span id="msgSmall">準備中</span>
+      <span id="combo">COMBO 0</span>
+      <span id="misses">MISS 0</span>
     </div>
 
-    <!-- オーバーレイ（開始/ゲームオーバー） -->
-    <div id="overlay" class="show">
-      <div class="panel">
-        <h1>木魚リズム：般若の間</h1>
-        <p>Space / クリックで木魚を叩く。<br>お経の拍に合わせよう。</p>
-        <p class="small">※ 画像・音源は <code>assets</code> 内に差し替えてください。</p>
+    <!-- オーバーレイ：開始・Settings -->
+    <div id="overlay" class="panel">
+      <h1>木魚リズム：般若の間</h1>
+      <div class="controls">
         <button id="startBtn">開始</button>
+        <button id="settingsBtn">Settings</button>
+      </div>
+      <p class="hint">Space / クリックで木魚を叩く</p>
+    </div>
+
+    <!-- Settings モーダル -->
+    <div id="settingsModal" class="modal hidden" role="dialog" aria-modal="true">
+      <div class="modalInner">
+        <h2>Settings</h2>
+
+        <div class="settingItem">
+          <label>Difficulty</label>
+          <div class="radioGroup">
+            <label><input type="radio" name="difficulty" value="easy"> Easy</label>
+            <label><input type="radio" name="difficulty" value="normal" checked> Normal</label>
+            <label><input type="radio" name="difficulty" value="hard"> Hard</label>
+          </div>
+          <small>Easy: ミス許容多め & 判定緩め / Hard: 1ミスで即死 & 判定厳しめ</small>
+        </div>
+
+        <div class="settingItem">
+          <label>Judgement Position</label>
+          <div class="radioGroup">
+            <label><input type="radio" name="judPos" value="bottom" checked> 木魚の下</label>
+            <label><input type="radio" name="judPos" value="top"> 木魚の上</label>
+          </div>
+        </div>
+
+        <div class="settingItem">
+          <label>BPM (楽曲のテンポ)</label>
+          <input id="bpmInput" type="number" min="30" max="240" value="80">
+        </div>
+
+        <div class="settingItem">
+          <label>Offset (秒)</label>
+          <input id="offsetInput" type="number" step="0.01" value="0.0">
+        </div>
+
+        <div class="settingButtons">
+          <button id="applySettings">適用</button>
+          <button id="closeSettings">閉じる</button>
+        </div>
+        <p class="small">※ 音源は <code>assets/bgm.mp3</code>、SEは <code>assets/se_hit.mp3</code> / <code>assets/se_miss.mp3</code></p>
       </div>
     </div>
 
-    <div id="gameover" class="hidden">
-      <div class="panel">
-        <h1>首が真後ろに…</h1>
-        <p>般若に殺された…</p>
-        <button id="retryBtn">もう一度</button>
+    <!-- GAME OVER 表示 -->
+    <div id="gameOverScreen" class="overlayHidden">
+      <div class="gameOverInner">
+        <div id="bigGameOver">GAME OVER</div>
+        <div id="subText">殺されてしまった…</div>
+        <button id="retryBtn">Retry</button>
       </div>
     </div>
+
+    <!-- audio elements -->
+    <audio id="bgm" src="assets/bgm.mp3" preload="auto"></audio>
+    <audio id="seHit" src="assets/se_hit.mp3" preload="auto"></audio>
+    <audio id="seMiss" src="assets/se_miss.mp3" preload="auto"></audio>
   </div>
-
-  <!-- 音源はHTMLAudio（再生）＋ WebAudio（高精度判定） -->
-  <audio id="bgm" src="assets/bgm.mp3" preload="auto"></audio>
-  <audio id="seHit" src="assets/se_hit.mp3" preload="auto"></audio>
-  <audio id="seMiss" src="assets/se_miss.mp3" preload="auto"></audio>
 
   <script src="main.js"></script>
 </body>
