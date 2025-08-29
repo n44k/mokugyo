@@ -1,95 +1,82 @@
-/* ベース */
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;background:#000;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Meiryo}
-#game{
-  position:relative;
-  width:min(100vw,100vh*16/9);
-  height:calc(min(100vw,100vh*16/9)*9/16);
-  margin:0 auto; overflow:hidden; border:2px solid rgba(255,255,255,0.08);
-  background:#111;
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: black;
+  color: white;
+  overflow: hidden;
+  text-align: center;
 }
 
-/* 左上 お経マーク */
-#buddhaMark{position:absolute;left:8px;top:8px;background:rgba(0,0,0,0.4);padding:6px 10px;border-radius:6px;font-weight:700;z-index:40}
-
-/* 背景画像 */
-#bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(0.9);z-index:0}
-
-/* 般若 */
-#hannya{
-  position:absolute; width:28%; right:-10%; bottom:10%;
-  transform-origin:50% 100%; transform:scale(0.6);
-  opacity:0; transition:transform .22s ease, opacity .22s ease, right .22s ease, bottom .22s ease, filter .22s ease;
-  z-index:30; pointer-events:none; filter:blur(1px) brightness(.9);
-}
-
-/* ノーツ */
-#noteLayer{position:absolute;inset:0;pointer-events:none;z-index:20}
-.note{
-  position:absolute; left:50%; transform:translateX(-50%); width:48px; height:48px;
-  border-radius:8px; background:rgba(255,255,255,0.9); display:grid;place-items:center;
-  font-weight:800;color:#000; box-shadow:0 6px 14px rgba(0,0,0,0.5);
-  will-change:transform,opacity;
-}
-
-/* 木魚ボタン */
-#mokugyoBtn{position:absolute;left:6%;bottom:6%;background:none;border:none;padding:0;z-index:35;cursor:pointer}
-#mokugyo{width:clamp(140px,18vw,260px);user-select:none;-webkit-user-drag:none;filter:drop-shadow(0 8px 14px rgba(0,0,0,0.6))}
-
-/* 判定エリア */
-.judgementArea{position:absolute;left:0;right:0;display:flex;justify-content:center;pointer-events:none;font-size:28px;font-weight:800;text-shadow:0 2px 8px rgba(0,0,0,0.7);z-index:50}
-#judgementTop{top:14%}
-#judgementBottom{bottom:18%}
-
-/* HUD */
-#hud{position:absolute;left:8px;top:48px;z-index:45;display:flex;gap:10px;align-items:center;font-weight:700;opacity:.95}
-#hud .small{opacity:.9}
-
-/* overlay start */
-.panel{position:absolute;inset:0;display:grid;place-items:center;z-index:60;background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.2))}
-.controls{display:flex;gap:12px;margin-top:8px}
-#startBtn,#settingsBtn{padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
-#startBtn{background:#fff;color:#000}#settingsBtn{background:rgba(255,255,255,0.12);color:#fff}
-
-/* settings modal */
-.modal{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:80}
-.modalInner{background:rgba(10,10,10,0.85);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);width:360px}
-.settingItem{margin:8px 0}
-.radioGroup{display:flex;gap:8px;margin-top:6px}
-.settingButtons{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
-.hidden{display:none}
-
-/* Game Over big */
-#gameOverScreen{position:absolute;inset:0;display:grid;place-items:center;z-index:120;pointer-events:none}
-.overlayHidden{display:none}
-.gameOverInner{background:rgba(0,0,0,0.7);padding:24px;border-radius:10px;text-align:center}
-#bigGameOver{font-size:72px;font-weight:900;color:#ffdddd;margin-bottom:6px}
-#subText{font-size:20px;opacity:0.9;margin-bottom:12px}
-#retryBtn{padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:800}
-
-#gameOverScreen {
-  display: none; /* 初期は非表示 */
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.8);
-  color: red;
-  font-size: 48px;
-  font-weight: bold;
+/* 共通スクリーン */
+.screen {
+  display: none;
+  width: 100vw;
+  height: 100vh;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  z-index: 999;
 }
 
-/* effects: shake / bigger shake / rotate 60deg */
-.shake{animation:shake 500ms ease-in-out}
-.bigShake{animation:shake 900ms cubic-bezier(.2,.8,.2,1)}
-@keyframes shake{0%{transform:translateY(0)}25%{transform:translateY(-6px)}50%{transform:translateY(4px)}75%{transform:translateY(-3px)}100%{transform:translateY(0)}}
-.rotate60{transform-origin:center center;transition:transform 600ms ease; transform:rotate(60deg)}
+/* オーバーレイ (settings, gameover) */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.95); /* 透けない黒背景 */
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
-/* snap (首ゴキ) */
-body.neck-snap #game{animation:snap 700ms ease-in forwards}
-@keyframes snap{0%{transform:rotate(0)}30%{transform:rotate(-12deg) scale(1.02)}55%{transform:rotate(7deg) scale(1.04)}100%{transform:rotate(0) filter:grayscale(.9)}}
+/* 設定ボックス */
+.settingsBox, .gameOverBox {
+  background: #222;
+  padding: 20px;
+  border-radius: 10px;
+  color: white;
+}
 
-/* small helpers */
-.small{font-size:12px;color:#ccc}
+/* ゲーム背景 */
+#bg {
+  background: url("assets/bg_room.jpg") no-repeat center center;
+  background-size: cover;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -1;
+}
+
+/* 般若 */
+#hannya {
+  position: absolute;
+  bottom: 50px;
+  right: -200px;
+  font-size: 100px;
+  transition: right 0.5s;
+}
+
+/* お経マーク */
+#chantMark {
+  position: absolute;
+  top: 10px; left: 10px;
+  font-size: 40px;
+}
+
+/* 判定表示 */
+#judgement {
+  position: absolute;
+  width: 100%;
+  font-size: 40px;
+  font-weight: bold;
+  text-align: center;
+  top: 200px; /* デフォルトは上 */
+}
+
+/* コンボ表示 */
+#combo {
+  position: absolute;
+  top: 60px;
+  left: 10px;
+  font-size: 24px;
+}
