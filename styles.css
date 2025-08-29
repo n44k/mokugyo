@@ -67,6 +67,20 @@ html,body{height:100%;margin:0;background:#000;color:#fff;font-family:system-ui,
 #subText{font-size:20px;opacity:0.9;margin-bottom:12px}
 #retryBtn{padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:800}
 
+#gameOverScreen {
+  display: none; /* 初期は非表示 */
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.8);
+  color: red;
+  font-size: 48px;
+  font-weight: bold;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 999;
+}
+
 /* effects: shake / bigger shake / rotate 60deg */
 .shake{animation:shake 500ms ease-in-out}
 .bigShake{animation:shake 900ms cubic-bezier(.2,.8,.2,1)}
