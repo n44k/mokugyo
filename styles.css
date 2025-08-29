@@ -1,122 +1,81 @@
-* { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; }
-body {
-  background: #000;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "メイリオ", sans-serif;
-  color: #fff;
+/* ベース */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#000;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Meiryo}
+#game{
+  position:relative;
+  width:min(100vw,100vh*16/9);
+  height:calc(min(100vw,100vh*16/9)*9/16);
+  margin:0 auto; overflow:hidden; border:2px solid rgba(255,255,255,0.08);
+  background:#111;
 }
 
-#game {
-  position: relative;
-  width: min(100vw, 100vh * 16/9);
-  height: calc(min(100vw, 100vh * 16/9) * 9/16);
-  margin: 0 auto;
-  overflow: hidden;
-  border: 2px solid rgba(255,255,255,0.2);
-  background: #000;
+/* 左上 お経マーク */
+#buddhaMark{position:absolute;left:8px;top:8px;background:rgba(0,0,0,0.4);padding:6px 10px;border-radius:6px;font-weight:700;z-index:40}
+
+/* 背景画像 */
+#bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(0.9);z-index:0}
+
+/* 般若 */
+#hannya{
+  position:absolute; width:28%; right:-10%; bottom:10%;
+  transform-origin:50% 100%; transform:scale(0.6);
+  opacity:0; transition:transform .22s ease, opacity .22s ease, right .22s ease, bottom .22s ease, filter .22s ease;
+  z-index:30; pointer-events:none; filter:blur(1px) brightness(.9);
 }
 
-/* 背景（和室） */
-#bg {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%; object-fit: cover;
-  filter: brightness(0.9);
-}
-
-/* 般若の演出：奥から手前へ（位置＋スケール＋ぼかし） */
-#hannya {
-  position: absolute;
-  bottom: 12%;
-  right: -10%;
-  width: 28%;
-  transform-origin: 50% 100%;
-  transform: translate3d(0,0,0) scale(0.6);
-  filter: blur(1px) brightness(0.9);
-  opacity: 0.0;
-  transition: transform 220ms ease, opacity 220ms ease, filter 220ms ease, right 220ms ease, bottom 220ms ease;
-  pointer-events: none;
+/* ノーツ */
+#noteLayer{position:absolute;inset:0;pointer-events:none;z-index:20}
+.note{
+  position:absolute; left:50%; transform:translateX(-50%); width:48px; height:48px;
+  border-radius:8px; background:rgba(255,255,255,0.9); display:grid;place-items:center;
+  font-weight:800;color:#000; box-shadow:0 6px 14px rgba(0,0,0,0.5);
+  will-change:transform,opacity;
 }
 
 /* 木魚ボタン */
-#mokugyoBtn {
-  position: absolute;
-  left: 6%;
-  bottom: 6%;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  outline: none;
-  transform: translateZ(0);
-}
-#mokugyo {
-  width: clamp(140px, 18vw, 260px);
-  user-select: none;
-  -webkit-user-drag: none;
-  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.6));
-}
-#mokugyoBtn:active #mokugyo {
-  transform: scale(0.96);
-}
+#mokugyoBtn{position:absolute;left:6%;bottom:6%;background:none;border:none;padding:0;z-index:35;cursor:pointer}
+#mokugyo{width:clamp(140px,18vw,260px);user-select:none;-webkit-user-drag:none;filter:drop-shadow(0 8px 14px rgba(0,0,0,0.6))}
+
+/* 判定エリア */
+.judgementArea{position:absolute;left:0;right:0;display:flex;justify-content:center;pointer-events:none;font-size:28px;font-weight:800;text-shadow:0 2px 8px rgba(0,0,0,0.7);z-index:50}
+#judgementTop{top:14%}
+#judgementBottom{bottom:18%}
 
 /* HUD */
-#hud {
-  position: absolute; left: 0; right: 0; top: 0;
-  display: flex; flex-direction: column; gap: 8px;
-  padding: 10px 14px;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0));
-}
-#status {
-  display: flex; gap: 18px; align-items: center; font-weight: 700;
-}
-#msg { opacity: 0.9; }
-#combo, #lives { opacity: 0.85; }
+#hud{position:absolute;left:8px;top:48px;z-index:45;display:flex;gap:10px;align-items:center;font-weight:700;opacity:.95}
+#hud .small{opacity:.9}
 
-/* タイミング可視化バー（中央が理想拍） */
-#barWrap {
-  position: relative;
-  height: 6px;
-  margin: 4px 0 0;
-  background: rgba(255,255,255,0.12);
-  border-radius: 999px;
-  overflow: hidden;
-}
-#timingBar {
-  position: absolute; top: 0; bottom: 0;
-  left: 50%; width: 2px; transform: translateX(-50%);
-  background: rgba(255,255,255,0.8);
-}
+/* overlay start */
+.panel{position:absolute;inset:0;display:grid;place-items:center;z-index:60;background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.2))}
+.controls{display:flex;gap:12px;margin-top:8px}
+#startBtn,#settingsBtn{padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
+#startBtn{background:#fff;color:#000}#settingsBtn{background:rgba(255,255,255,0.12);color:#fff}
 
-/* オーバーレイ */
-#overlay, #gameover {
-  position: absolute; inset: 0;
-  display: grid; place-items: center;
-  background: rgba(0,0,0,0.6);
-}
-#overlay.hidden, #gameover.hidden { display: none; }
-#overlay .panel, #gameover .panel {
-  background: rgba(10,10,10,0.75);
-  padding: 22px 26px;
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 12px;
-  text-align: center;
-  max-width: 520px;
-}
-button#startBtn, button#retryBtn {
-  font-size: 16px; font-weight: 700;
-  padding: 10px 18px; margin-top: 10px;
-  background: #fff; color: #000;
-  border: none; border-radius: 8px; cursor: pointer;
-}
-button#startBtn:hover, button#retryBtn:hover { filter: brightness(0.9); }
+/* settings modal */
+.modal{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:80}
+.modalInner{background:rgba(10,10,10,0.85);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);width:360px}
+.settingItem{margin:8px 0}
+.radioGroup{display:flex;gap:8px;margin-top:6px}
+.settingButtons{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+.hidden{display:none}
 
-/* 首ゴキッ演出（画面全体をねじる） */
-body.neck-snap #game {
-  animation: snap 700ms ease-in forwards;
-}
-@keyframes snap {
-  0%   { transform: rotate(0deg) scale(1); filter: none; }
-  30%  { transform: rotate(-12deg) scale(1.02); filter: contrast(1.2) brightness(1.1); }
-  55%  { transform: rotate(7deg) scale(1.04); filter: contrast(1.4) brightness(0.9); }
-  100% { transform: rotate(0deg) scale(1.0); filter: grayscale(0.9) brightness(0.6); }
-}
+/* Game Over big */
+#gameOverScreen{position:absolute;inset:0;display:grid;place-items:center;z-index:120;pointer-events:none}
+.overlayHidden{display:none}
+.gameOverInner{background:rgba(0,0,0,0.7);padding:24px;border-radius:10px;text-align:center}
+#bigGameOver{font-size:72px;font-weight:900;color:#ffdddd;margin-bottom:6px}
+#subText{font-size:20px;opacity:0.9;margin-bottom:12px}
+#retryBtn{padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:800}
+
+/* effects: shake / bigger shake / rotate 60deg */
+.shake{animation:shake 500ms ease-in-out}
+.bigShake{animation:shake 900ms cubic-bezier(.2,.8,.2,1)}
+@keyframes shake{0%{transform:translateY(0)}25%{transform:translateY(-6px)}50%{transform:translateY(4px)}75%{transform:translateY(-3px)}100%{transform:translateY(0)}}
+.rotate60{transform-origin:center center;transition:transform 600ms ease; transform:rotate(60deg)}
+
+/* snap (首ゴキ) */
+body.neck-snap #game{animation:snap 700ms ease-in forwards}
+@keyframes snap{0%{transform:rotate(0)}30%{transform:rotate(-12deg) scale(1.02)}55%{transform:rotate(7deg) scale(1.04)}100%{transform:rotate(0) filter:grayscale(.9)}}
+
+/* small helpers */
+.small{font-size:12px;color:#ccc}
