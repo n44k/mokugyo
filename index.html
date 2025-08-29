@@ -85,16 +85,13 @@
         <p class="small">※ 音源は <code>assets/bgm.mp3</code>、SEは <code>assets/se_hit.mp3</code> / <code>assets/se_miss.mp3</code></p>
       </div>
     </div>
-
+    
     <!-- GAME OVER 表示 -->
-    <div id="gameOverScreen" class="overlayHidden">
-      <div class="gameOverInner">
-        <div id="bigGameOver">GAME OVER</div>
-        <div id="subText">殺されてしまった…</div>
-        <button id="retryBtn">Retry</button>
-      </div>
+    <div id="gameOverScreen">
+      <div>GAME OVER</div>
+      <div style="font-size: 24px; margin-top: 10px;">殺されてしまった...</div>
+      <button onclick="restartGame()">Restart</button>
     </div>
-
     <!-- audio elements -->
     <audio id="bgm" src="assets/bgm.mp3" preload="auto"></audio>
     <audio id="seHit" src="assets/se_hit.mp3" preload="auto"></audio>
