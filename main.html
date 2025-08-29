@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>木魚リズム：般若の間</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preload" as="audio" href="assets/bgm.mp3">
+  <link rel="preload" as="audio" href="assets/se_hit.mp3">
+  <link rel="preload" as="audio" href="assets/se_miss.mp3">
+  <link rel="preload" as="image" href="assets/bg_room.jpg">
+  <link rel="preload" as="image" href="assets/mokugyo.png">
+  <link rel="preload" as="image" href="assets/hannya.png">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="game">
+    <!-- 背景（和室） -->
+    <img id="bg" src="assets/bg_room.jpg" alt="和室背景" />
+
+    <!-- 般若（右奥→接近→背後へ移動演出→GameOver） -->
+    <img id="hannya" src="assets/hannya.png" alt="般若" aria-hidden="true" />
+
+    <!-- 木魚（クリックまたはSpaceで叩く） -->
+    <button id="mokugyoBtn" aria-label="木魚を叩く">
+      <img id="mokugyo" src="assets/mokugyo.png" alt="木魚" />
+    </button>
+
+    <!-- UI -->
+    <div id="hud">
+      <div id="status">
+        <span id="msg">お経に合わせて叩け</span>
+        <span id="combo">COMBO 0</span>
+        <span id="lives">MISS 0/6</span>
+      </div>
+      <div id="barWrap" aria-hidden="true"><div id="timingBar"></div></div>
+    </div>
+
+    <!-- オーバーレイ（開始/ゲームオーバー） -->
+    <div id="overlay" class="show">
+      <div class="panel">
+        <h1>木魚リズム：般若の間</h1>
+        <p>Space / クリックで木魚を叩く。<br>お経の拍に合わせよう。</p>
+        <p class="small">※ 画像・音源は <code>assets</code> 内に差し替えてください。</p>
+        <button id="startBtn">開始</button>
+      </div>
+    </div>
+
+    <div id="gameover" class="hidden">
+      <div class="panel">
+        <h1>首が真後ろに…</h1>
+        <p>般若に殺された…</p>
+        <button id="retryBtn">もう一度</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 音源はHTMLAudio（再生）＋ WebAudio（高精度判定） -->
+  <audio id="bgm" src="assets/bgm.mp3" preload="auto"></audio>
+  <audio id="seHit" src="assets/se_hit.mp3" preload="auto"></audio>
+  <audio id="seMiss" src="assets/se_miss.mp3" preload="auto"></audio>
+
+  <script src="main.js"></script>
+</body>
+</html>
